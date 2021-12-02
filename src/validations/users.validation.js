@@ -24,6 +24,10 @@ export default class UsersValidation {
         "any.required": "Ulangi kata sandi tidak boleh kosong",
         "any.only": "Kata sandi harus sama dengan kata sandi sebelumnya",
       }),
+    role_name: Joi.string().required().messages({
+      "string.empty": `Role tidak boleh kosong`,
+      "any.required": `Role harus diisi`,
+    }),
   });
 
   LoginValidationSchema = Joi.object({
