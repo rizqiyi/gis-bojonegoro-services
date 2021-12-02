@@ -5,7 +5,8 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon index",
+    "start": "node server.js",
+    "dev": "nodemon server",
     "migrate": "npx prisma migrate dev --name init"
   },
   "keywords": [],
