@@ -1,3 +1,5 @@
+import ErrorHandler from "../helpers/error.helper.js";
+
 export const roleMiddleware = async (req, res, next) => {
   try {
     if (req.user.payload.role === "user") {
@@ -6,9 +8,6 @@ export const roleMiddleware = async (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: err.message,
-    });
+    ErrorHandler(res, err, 400);
   }
 };
