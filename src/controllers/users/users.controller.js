@@ -17,12 +17,12 @@ export default class Users {
 
       const emailHasRegistered = await prisma.gis_user.findUnique({
         where: {
-          email: req.body.email,
+          username: req.body.username,
         },
       });
 
       if (emailHasRegistered)
-        return ErrorHandler(res, "Email sudah digunakan", 400);
+        return ErrorHandler(res, "Nama pengguna sudah digunakan", 400);
 
       const salt = await bcrypt.genSalt(10);
 
@@ -77,7 +77,7 @@ export default class Users {
       if (!isPasswordValid) return ErrorHandler(res, "Password salah", 400);
 
       res.cookie(
-        "authToken",
+        "x-auth-token",
         createToken({ id: findUser.id, role: findUser.gis_role.role_name }),
         {
           httpOnly: true,
