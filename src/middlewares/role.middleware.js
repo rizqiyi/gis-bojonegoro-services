@@ -8,6 +8,6 @@ export const roleMiddleware = async (req, res, next) => {
 
     next();
   } catch (err) {
-    ErrorHandler(res, err, 400);
+    ErrorHandler(res, err.message, 400);
   }
 };
