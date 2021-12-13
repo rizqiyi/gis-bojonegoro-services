@@ -56,6 +56,24 @@ export default class Users {
     }
   };
 
+  getAll = async (req, res) => {
+    try {
+      const data = await prisma.gis_user.findMany({
+        select: {
+          username: true,
+          email: true,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (err) {
+      ErrorHandler(res, err, 400);
+    }
+  };
+
   updateRole = async (req, res) => {
     try {
       const isNotValidate = schema.RegisterValidationSchema.validate(req.body);
@@ -160,7 +178,11 @@ export default class Users {
 
       res.cookie(
         "x-auth-token",
-        createToken({ id: findUser.id, role: findUser.role_name }),
+        createToken({
+          id: findUser.id,
+          role: findUser.role_name,
+          street_path: findUser.manage,
+        }),
         {
           httpOnly: true,
           maxAge: 3 * 24 * 60 * 60,

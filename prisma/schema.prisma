@@ -13,13 +13,53 @@ datasource db {
 model gis_user {
   id        Int       @id @default(autoincrement())
   email     String    
+  avatar    String    
   username  String    @unique
   fullname  String
   password  String
   manage    String
   role_name String
+  drainases gis_drainase[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model gis_drainase {
+  id Int @id @default(autoincrement())
+  latitude Float
+  longitude Float
+  district String
+  sub_district String
+  street_name String
+  street_width String
+  images gis_image_drainase[]
+  left_typical String
+  left_drainase_depth String
+  left_drainase_width String
+  left_drainase_condiiton String
+  right_typical String
+  right_drainase_depth String
+  right_drainase_width String
+  right_drainase_condiiton String
+  note String
+  sta String
+  street_path String
+  description String
+  is_published Boolean
+  user_id Int
+  user    gis_user @relation(fields: [user_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model gis_image_drainase {
+  id          Int       @id @default(autoincrement())
+  image_path  String
+  image_name  String
+  drainase_id Int
+  drainase    gis_drainase @relation(fields: [drainase_id], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model gis_role {
