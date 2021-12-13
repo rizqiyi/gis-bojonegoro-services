@@ -10,5 +10,6 @@ const route = Router();
 route.post("/login", user.login);
 route.post("/register", authMiddleware, roleMiddleware, user.create);
 route.put("/update-role", authMiddleware, roleMiddleware, user.updateRole);
+route.delete("/delete/:id", authMiddleware, roleMiddleware, user.delete);
 
 export default route;

@@ -93,12 +93,46 @@ export default class Users {
         },
       });
 
-      return res.status(201).json({
+      return res.status(200).json({
         success: true,
         data,
       });
     } catch (err) {
       ErrorHandler(res, err, 400);
+    }
+  };
+
+  delete = async (req, res) => {
+    try {
+      const id = +req.params.id;
+
+      const idExist = await prisma.gis_user.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!idExist) return ErrorHandler(res, "Pengguna tidak ditemukan", 400);
+
+      if (id === req.user.payload.id)
+        return ErrorHandler(
+          res,
+          "Pengguna tidak dapat menghapus data diri sendiri",
+          400
+        );
+
+      await prisma.gis_user.delete({
+        where: {
+          id,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Pengguna berhasil dihapus",
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
     }
   };
 
