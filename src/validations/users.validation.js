@@ -28,6 +28,10 @@ export default class UsersValidation {
       "string.empty": `Role tidak boleh kosong`,
       "any.required": `Role harus diisi`,
     }),
+    manage: Joi.string().required().messages({
+      "string.empty": `Aksi tidak boleh kosong`,
+      "any.required": `Aksi harus diisi`,
+    }),
   });
 
   LoginValidationSchema = Joi.object({

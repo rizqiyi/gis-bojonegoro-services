@@ -15,14 +15,22 @@ export default class Users {
       if (isNotValidate.error)
         return ErrorHandler(res, isNotValidate.error.details[0].message, 400);
 
-      const emailHasRegistered = await prisma.gis_user.findUnique({
+      const usernameHasRegistered = await prisma.gis_user.findUnique({
         where: {
           username: req.body.username,
         },
       });
 
-      if (emailHasRegistered)
+      if (usernameHasRegistered)
         return ErrorHandler(res, "Nama pengguna sudah digunakan", 400);
+
+      const roleData = await prisma.gis_role.findFirst({
+        where: {
+          role_name: req.body.role_name,
+        },
+      });
+
+      if (!roleData) return ErrorHandler(res, "Role tidak ditemukan", 400);
 
       const salt = await bcrypt.genSalt(10);
 
@@ -33,16 +41,11 @@ export default class Users {
           email: req.body.email,
           fullname: req.body.fullname,
           username: req.body.username,
+          manage: req.body.manage,
+          role_name: roleData.role_name,
           password: passwordHash,
-          gis_role: {
-            create: {
-              role_name: req.body.role_name,
-            },
-          },
         },
       });
-
-      delete data.password;
 
       return res.status(201).json({
         success: true,
@@ -53,6 +56,104 @@ export default class Users {
     }
   };
 
+  getAll = async (req, res) => {
+    try {
+      const data = await prisma.gis_user.findMany({
+        select: {
+          username: true,
+          email: true,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (err) {
+      ErrorHandler(res, err, 400);
+    }
+  };
+
+  updateRole = async (req, res) => {
+    try {
+      const isNotValidate = schema.RegisterValidationSchema.validate(req.body);
+
+      if (isNotValidate.error)
+        return ErrorHandler(res, isNotValidate.error.details[0].message, 400);
+
+      const usernameHasRegistered = await prisma.gis_user.findUnique({
+        where: {
+          username: req.body.username,
+        },
+      });
+
+      if (!usernameHasRegistered)
+        return ErrorHandler(res, "Pengguna tidak ditemukan", 400);
+
+      const roleData = await prisma.gis_role.findFirst({
+        where: {
+          role_name: req.body.role_name,
+        },
+      });
+
+      if (!roleData) return ErrorHandler(res, "Role tidak ditemukan", 400);
+
+      const data = await prisma.gis_user.update({
+        where: {
+          username: usernameHasRegistered.username,
+        },
+        data: {
+          email: req.body.email,
+          fullname: req.body.fullname,
+          username: req.body.username,
+          manage: req.body.manage,
+          role_name: roleData.role_name,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (err) {
+      ErrorHandler(res, err, 400);
+    }
+  };
+
+  delete = async (req, res) => {
+    try {
+      const id = +req.params.id;
+
+      const idExist = await prisma.gis_user.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!idExist) return ErrorHandler(res, "Pengguna tidak ditemukan", 400);
+
+      if (id === req.user.payload.id)
+        return ErrorHandler(
+          res,
+          "Pengguna tidak dapat menghapus data diri sendiri",
+          400
+        );
+
+      await prisma.gis_user.delete({
+        where: {
+          id,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Pengguna berhasil dihapus",
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
+    }
+  };
+
   login = async (req, res) => {
     try {
       const isNotValidate = schema.LoginValidationSchema.validate(req.body);
@@ -60,14 +161,13 @@ export default class Users {
       if (isNotValidate.error)
         return ErrorHandler(res, isNotValidate.error.details[0].message, 400);
 
-      const findUser = await prisma.gis_user.findFirst({
+      const findUser = await prisma.gis_user.findUnique({
         where: {
           username: req.body.username,
         },
-        include: { gis_role: true },
       });
 
-      if (!findUser) return ErrorHandler(res, "Login gagal", 400);
+      if (!findUser) return ErrorHandler(res, "Pengguna tidak ditemukan", 400);
 
       const isPasswordValid = await bcrypt.compare(
         req.body.password,
@@ -78,7 +178,11 @@ export default class Users {
 
       res.cookie(
         "x-auth-token",
-        createToken({ id: findUser.id, role: findUser.gis_role.role_name }),
+        createToken({
+          id: findUser.id,
+          role: findUser.role_name,
+          street_path: findUser.manage,
+        }),
         {
           httpOnly: true,
           maxAge: 3 * 24 * 60 * 60,
@@ -92,7 +196,7 @@ export default class Users {
         data: findUser,
       });
     } catch (err) {
-      ErrorHandler(res, err);
+      ErrorHandler(res, err.message);
     }
   };
 }
