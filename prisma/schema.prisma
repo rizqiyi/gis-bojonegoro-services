@@ -16,16 +16,15 @@ model gis_user {
   username  String    @unique
   fullname  String
   password  String
+  manage    String
+  role_name String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  gis_role  gis_role?
 }
 
 model gis_role {
   id        Int      @id @default(autoincrement())
-  role_name String
-  user      gis_user @relation(fields: [user_id], references: id)
-  user_id   Int      @unique
+  role_name String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
