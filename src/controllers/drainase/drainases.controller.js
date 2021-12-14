@@ -1,11 +1,40 @@
 import Prisma from "@prisma/client";
 import ErrorHandler from "../../helpers/error.helper.js";
+import paginate from "../../helpers/paginate.helper.js";
 import DrainasesSchema from "../../validations/drainases.validations.js";
 
 const prisma = new Prisma.PrismaClient();
 const schema = new DrainasesSchema();
 
 export default class Drainases {
+  get = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page ?? 1, 10);
+      const perPage = parseInt(req.query.perPage ?? 10, 10);
+
+      const offset = page * perPage - perPage;
+      const realPerPage = perPage;
+
+      const drainase = await prisma.gis_drainase.findMany({
+        skip: offset,
+        take: realPerPage,
+      });
+
+      const data = await paginate(
+        { count: drainase.length, rows: drainase },
+        page,
+        perPage
+      );
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
+    }
+  };
+
   create = async (req, res) => {
     try {
       const isValidate = schema.DrainaseValidationSchema.validate(req.body);

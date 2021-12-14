@@ -5,6 +5,7 @@ import DrainasesController from "../controllers/drainase/drainases.controller.js
 const drainase = new DrainasesController();
 const route = Router();
 
+route.get("/", authMiddleware, drainase.get);
 route.post("/create", authMiddleware, drainase.create);
 
 export default route;
