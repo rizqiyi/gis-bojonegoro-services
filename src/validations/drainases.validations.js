@@ -26,29 +26,29 @@ export default class DrainaseValidation {
       "number.empty": `Lebar jalan tidak boleh kosong`,
       "any.required": `Lebar jalan harus diisi`,
     }),
-    images: Joi.array()
-      .items(
-        Joi.object({
-          image_path: Joi.string().required().messages({
-            "string.empty": `Path gambar pada data gambar tidak boleh kosong`,
-            "any.required": `Path gambar pada data gambar harus diisi`,
-          }),
-          image_name: Joi.string().required().messages({
-            "string.empty": `Nama gambar pada data gambar tidak boleh kosong`,
-            "any.required": `Nama gambar pada data gambar harus diisi`,
-          }),
-          // drainase_id: Joi.number().required().messages({
-          //   "number.empty": `ID Drainase pada data gambar tidak boleh kosong`,
-          //   "any.required": `ID Drainase pada data gambar harus diisi`,
-          // }),
-        }).required()
-      )
-      .required()
-      .messages({
-        "array.empty": `Data gambar tidak boleh kosong`,
-        "any.required": `Data gambar harus diisi`,
-        "array.min": `Data gambar tidak boleh kurang dari {#limit} karakter`,
-      }),
+    // images: Joi.array()
+    //   .items(
+    //     Joi.object({
+    //       image_path: Joi.string().required().messages({
+    //         "string.empty": `Path gambar pada data gambar tidak boleh kosong`,
+    //         "any.required": `Path gambar pada data gambar harus diisi`,
+    //       }),
+    //       image_name: Joi.string().required().messages({
+    //         "string.empty": `Nama gambar pada data gambar tidak boleh kosong`,
+    //         "any.required": `Nama gambar pada data gambar harus diisi`,
+    //       }),
+    //       drainase_id: Joi.number().required().messages({
+    //         "number.empty": `ID Drainase pada data gambar tidak boleh kosong`,
+    //         "any.required": `ID Drainase pada data gambar harus diisi`,
+    //       }),
+    //     }).required()
+    //   )
+    //   .required()
+    //   .messages({
+    //     "array.empty": `Data gambar tidak boleh kosong`,
+    //     "any.required": `Data gambar harus diisi`,
+    //     "array.min": `Data gambar tidak boleh kurang dari {#limit} karakter`,
+    //   }),
     left_typical: Joi.string().required().messages({
       "string.empty": `Tipikal kiri tidak boleh kosong`,
       "any.required": `Tipikal kiri harus diisi`,
@@ -61,7 +61,7 @@ export default class DrainaseValidation {
       "string.empty": `Lebar drainase kiri tidak boleh kosong`,
       "any.required": `Lebar drainase kiri harus diisi`,
     }),
-    left_drainase_condiiton: Joi.string().required().messages({
+    left_drainase_condition: Joi.string().required().messages({
       "string.empty": `Kondisi drainase kiri tidak boleh kosong`,
       "any.required": `Kondisi drainase kiri harus diisi`,
     }),
@@ -77,7 +77,7 @@ export default class DrainaseValidation {
       "string.empty": `Lebar drainase kanan tidak boleh kosong`,
       "any.required": `Lebar drainase kanan harus diisi`,
     }),
-    right_drainase_condiiton: Joi.string().required().messages({
+    right_drainase_condition: Joi.string().required().messages({
       "string.empty": `Kondisi drainase kanan tidak boleh kosong`,
       "any.required": `Kondisi drainase kanan harus diisi`,
     }),
