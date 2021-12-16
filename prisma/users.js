@@ -4,6 +4,7 @@ export default [
     email: "diarcp@gmail.com",
     fullname: "Diar Ciptani",
     avatar: "test",
+    avatar_id: "default",
     username: "diarcp",
     password: "123456",
     role_name: "Admin",
@@ -17,6 +18,7 @@ export default [
     username: "rizqiyi",
     password: "123456",
     role_name: "Super Admin",
+    avatar_id: "default",
     manage: "A",
   },
 ];

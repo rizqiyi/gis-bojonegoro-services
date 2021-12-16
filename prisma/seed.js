@@ -28,10 +28,12 @@ const main = async () => {
               {
                 image_path: "test",
                 image_name: "test.png",
+                image_id: "1",
               },
               {
                 image_path: "rizqi",
                 image_name: "rizqi2.png",
+                image_id: "2",
               },
             ],
           },
