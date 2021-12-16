@@ -14,6 +14,7 @@ model gis_user {
   id        Int       @id @default(autoincrement())
   email     String    
   avatar    String    
+  avatar_id String    
   username  String    @unique
   fullname  String
   password  String
