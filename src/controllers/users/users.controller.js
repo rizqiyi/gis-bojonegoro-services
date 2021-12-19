@@ -268,24 +268,23 @@ export default class Users {
 
       if (!isPasswordValid) return ErrorHandler(res, "Password salah", 400);
 
-      res.cookie(
-        "x-auth-token",
-        createToken({
-          id: findUser.id,
-          role: findUser.role_name,
-          street_path: findUser.manage,
-        }),
-        {
-          httpOnly: true,
-          maxAge: 3 * 24 * 60 * 60,
-        }
-      );
+      const token = createToken({
+        id: findUser.id,
+        role: findUser.role_name,
+        street_path: findUser.manage,
+      });
+
+      res.cookie("x-auth-token", token, {
+        httpOnly: true,
+        maxAge: 3 * 24 * 60 * 60,
+      });
 
       delete findUser.password;
 
       return res.status(200).json({
         success: true,
         data: findUser,
+        token,
       });
     } catch (err) {
       ErrorHandler(res, err.message);

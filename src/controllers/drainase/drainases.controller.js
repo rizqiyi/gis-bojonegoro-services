@@ -65,7 +65,9 @@ export default class Drainases {
       if (isValidate.error)
         return ErrorHandler(res, isValidate.error.details[0].message, 400);
 
-      req.files.map((file, idx) =>
+      const images = [];
+
+      req.files.map((file) =>
         ImageKit.upload(
           {
             file: file.buffer.toString("base64"),
@@ -75,17 +77,13 @@ export default class Drainases {
           async (err, docs) => {
             if (err) throw err;
 
-            const images = [];
+            images.push({
+              image_path: docs.filePath,
+              image_name: docs.name,
+              image_id: docs.fileId,
+            });
 
-            for (let index = 0; index < req.files.length; index++) {
-              images.push({
-                image_path: docs.filePath,
-                image_name: docs.name,
-                image_id: docs.fileId,
-              });
-            }
-
-            if (idx + 1 === req.files.length) {
+            if (images.length === req.files.length) {
               await prisma.gis_drainase.create({
                 data: {
                   latitude: parseFloat(req.body.latitude),
@@ -160,8 +158,10 @@ export default class Drainases {
         user_id: +req.user.payload.id,
       });
 
+      const images = [];
+
       if (req.files.length > 0) {
-        req.files.map((file, idx) =>
+        req.files.map((file) =>
           ImageKit.upload(
             {
               file: file.buffer.toString("base64"),
@@ -171,17 +171,13 @@ export default class Drainases {
             async (err, docs) => {
               if (err) throw err;
 
-              const images = [];
+              images.push({
+                image_path: docs.filePath,
+                image_name: docs.name,
+                image_id: docs.fileId,
+              });
 
-              for (let index = 0; index < req.files.length; index++) {
-                images.push({
-                  image_path: docs.filePath,
-                  image_name: docs.name,
-                  image_id: docs.fileId,
-                });
-              }
-
-              if (idx + 1 === req.files.length) {
+              if (images.length === req.files.length) {
                 await prisma.gis_drainase.update({
                   where: {
                     id: +req.params.id,
@@ -288,6 +284,19 @@ export default class Drainases {
 
   delete = async (req, res) => {
     try {
+      const images = await prisma.gis_image_drainase.findMany({
+        where: {
+          drainase_id: +req.params.id,
+        },
+      });
+
+      await ImageKit.bulkDeleteFiles(
+        images.map((image) => image.image_id),
+        (err) => {
+          if (err) throw err;
+        }
+      );
+
       await prisma.gis_drainase.delete({
         where: {
           id: +req.params.id,
