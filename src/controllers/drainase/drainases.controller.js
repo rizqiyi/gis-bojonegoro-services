@@ -16,6 +16,9 @@ export default class Drainases {
       const offset = page * perPage - perPage;
 
       const drainase = await prisma.gis_drainase.findMany({
+        ...(req.query.is_published
+          ? { where: { is_published: JSON.parse(req.query.is_published) } }
+          : {}),
         skip: offset,
         take: perPage,
         include: {
