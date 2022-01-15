@@ -11,18 +11,33 @@ route.get("/:id", drainase.getByID);
 route.post(
   "/create",
   authMiddleware,
-  multer().array("images", 5),
+  multer().fields([
+    { name: "left_drainase_images", maxCount: 2 },
+    { name: "right_drainase_images", maxCount: 2 },
+  ]),
   drainase.create
 );
 route.put(
   "/update/:id",
   authMiddleware,
-  multer().array("images", 5),
+  multer().fields([
+    { name: "left_drainase_images", maxCount: 2 },
+    { name: "right_drainase_images", maxCount: 2 },
+  ]),
   drainase.update
 );
 route.put("/activate/:id", authMiddleware, drainase.active);
 route.put("/deactive/:id", authMiddleware, drainase.softDelete);
-route.delete("/delete/image/:idImage", authMiddleware, drainase.deleteImage);
+route.delete(
+  "/delete/left-image/:idImage",
+  authMiddleware,
+  drainase.deleteLeftImage
+);
+route.delete(
+  "/delete/right-image/:idImage",
+  authMiddleware,
+  drainase.deleteRightImage
+);
 route.delete("/delete/:id", authMiddleware, drainase.delete);
 
 export default route;

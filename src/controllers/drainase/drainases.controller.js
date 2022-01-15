@@ -22,7 +22,8 @@ export default class Drainases {
         skip: offset,
         take: perPage,
         include: {
-          images: true,
+          left_images_drainase: true,
+          right_images_drainase: true,
         },
       });
 
@@ -48,7 +49,8 @@ export default class Drainases {
           id: +req.params.id,
         },
         include: {
-          images: true,
+          left_images_drainase: true,
+          right_images_drainase: true,
         },
       });
 
@@ -70,11 +72,14 @@ export default class Drainases {
 
       const images = [];
 
-      req.files.map((file) =>
+      [
+        ...req.files.left_drainase_images,
+        ...req.files.right_drainase_images,
+      ].map((file) =>
         ImageKit.upload(
           {
             file: file.buffer.toString("base64"),
-            fileName: file.originalname,
+            fileName: `${file.fieldname}_${file.originalname}`,
             useUniqueFileName: true,
           },
           async (err, docs) => {
@@ -86,7 +91,19 @@ export default class Drainases {
               image_id: docs.fileId,
             });
 
-            if (images.length === req.files.length) {
+            if (
+              images.length ===
+              req.files.left_drainase_images.length +
+                req.files.right_drainase_images.length
+            ) {
+              const rightImages = images.filter(
+                (image) => image.image_name.split("_")[0] !== "left"
+              );
+
+              const leftImages = images.filter(
+                (image) => image.image_name.split("_")[0] !== "right"
+              );
+
               await prisma.gis_drainase.create({
                 data: {
                   latitude: parseFloat(req.body.latitude),
@@ -97,8 +114,11 @@ export default class Drainases {
                   street_width: req.body.street_width,
                   sta: req.body.sta,
                   street_path: req.user.payload.street_path,
-                  images: {
-                    create: images,
+                  right_images_drainase: {
+                    create: rightImages,
+                  },
+                  left_images_drainase: {
+                    create: leftImages,
                   },
                   left_typical: req.body.left_typical,
                   left_drainase_depth: req.body.left_drainase_depth,
@@ -135,7 +155,7 @@ export default class Drainases {
       if (isValidate.error)
         return ErrorHandler(res, isValidate.error.details[0].message, 400);
 
-      const requestBody = (images = []) => ({
+      const requestBody = ({ rightImages = [], leftImages = [] }) => ({
         latitude: parseFloat(req.body.latitude),
         longitude: parseFloat(req.body.longitude),
         district: req.body.district,
@@ -144,8 +164,11 @@ export default class Drainases {
         street_width: req.body.street_width,
         sta: req.body.sta,
         street_path: req.user.payload.street_path,
-        images: {
-          create: images,
+        right_images_drainase: {
+          create: rightImages,
+        },
+        left_images_drainase: {
+          create: leftImages,
         },
         left_typical: req.body.left_typical,
         left_drainase_depth: req.body.left_drainase_depth,
@@ -163,12 +186,15 @@ export default class Drainases {
 
       const images = [];
 
-      if (req.files.length > 0) {
+      if (
+        [...req.files.left_drainase_images, ...req.files.right_drainase_images]
+          .length > 0
+      ) {
         req.files.map((file) =>
           ImageKit.upload(
             {
               file: file.buffer.toString("base64"),
-              fileName: file.originalname,
+              fileName: `${file.fieldname}_${file.originalname}`,
               useUniqueFileName: true,
             },
             async (err, docs) => {
@@ -180,12 +206,24 @@ export default class Drainases {
                 image_id: docs.fileId,
               });
 
-              if (images.length === req.files.length) {
+              if (
+                images.length ===
+                req.files.left_drainase_images.length +
+                  req.files.right_drainase_images.length
+              ) {
+                const rightImages = images.filter(
+                  (image) => image.image_name.split("_")[0] !== "left"
+                );
+
+                const leftImages = images.filter(
+                  (image) => image.image_name.split("_")[0] !== "right"
+                );
+
                 await prisma.gis_drainase.update({
                   where: {
                     id: +req.params.id,
                   },
-                  data: requestBody(images),
+                  data: requestBody({ rightImages, leftImages }),
                 });
 
                 return res.status(201).json({
@@ -199,7 +237,8 @@ export default class Drainases {
       } else {
         const data = requestBody();
 
-        delete data.images;
+        delete data.left_images_drainase;
+        delete data.right_images_drainase;
 
         await prisma.gis_drainase.update({
           where: {
@@ -258,9 +297,9 @@ export default class Drainases {
     }
   };
 
-  deleteImage = async (req, res) => {
+  deleteLeftImage = async (req, res) => {
     try {
-      const imageToDelete = await prisma.gis_image_drainase.findUnique({
+      const imageToDelete = await prisma.gis_left_images_drainase.findUnique({
         where: {
           id: +req.params.idImage,
         },
@@ -269,7 +308,34 @@ export default class Drainases {
       ImageKit.deleteFile(imageToDelete.image_id, async (err) => {
         if (err) throw err;
 
-        await prisma.gis_image_drainase.delete({
+        await prisma.gis_left_images_drainase.delete({
+          where: {
+            id: +req.params.idImage,
+          },
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "Gambar berhasil dihapus",
+        });
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
+    }
+  };
+
+  deleteRightImage = async (req, res) => {
+    try {
+      const imageToDelete = await prisma.gis_right_images_drainase.findUnique({
+        where: {
+          id: +req.params.idImage,
+        },
+      });
+
+      ImageKit.deleteFile(imageToDelete.image_id, async (err) => {
+        if (err) throw err;
+
+        await prisma.gis_right_images_drainase.delete({
           where: {
             id: +req.params.idImage,
           },
