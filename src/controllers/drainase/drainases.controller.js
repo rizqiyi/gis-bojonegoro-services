@@ -353,16 +353,22 @@ export default class Drainases {
 
   delete = async (req, res) => {
     try {
-      const images = await prisma.gis_image_drainase.findMany({
+      const leftImages = await prisma.gis_left_images_drainase.findMany({
+        where: {
+          drainase_id: +req.params.id,
+        },
+      });
+
+      const rightImages = await prisma.gis_right_images_drainase.findMany({
         where: {
           drainase_id: +req.params.id,
         },
       });
 
       await ImageKit.bulkDeleteFiles(
-        images.map((image) => image.image_id),
+        [...leftImages, ...rightImages].map((image) => image.image_id),
         (err) => {
-          if (err) throw err;
+          if (err) ErrorHandler(res, err.message, 400);
         }
       );
 
