@@ -187,8 +187,10 @@ export default class Drainases {
       const images = [];
 
       if (
-        [...req.files.left_drainase_images, ...req.files.right_drainase_images]
-          .length > 0
+        [
+          ...(req.files.left_drainase_images || []),
+          ...(req.files.right_drainase_images || []),
+        ].length > 0
       ) {
         req.files.map((file) =>
           ImageKit.upload(
