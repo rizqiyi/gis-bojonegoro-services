@@ -192,7 +192,10 @@ export default class Drainases {
           ...(req.files.right_drainase_images || []),
         ].length > 0
       ) {
-        req.files.map((file) =>
+        [
+          ...(req.files.left_drainase_images || []),
+          ...(req.files.right_drainase_images || []),
+        ].map((file) =>
           ImageKit.upload(
             {
               file: file.buffer.toString("base64"),
@@ -209,9 +212,9 @@ export default class Drainases {
               });
 
               if (
-                images.length ===
-                req.files.left_drainase_images.length +
-                  req.files.right_drainase_images.length
+                images.length === req.files.left_drainase_images.length ||
+                0 + req.files.right_drainase_images.length ||
+                0
               ) {
                 const rightImages = images.filter(
                   (image) => image.image_name.split("_")[0] !== "left"
@@ -237,7 +240,7 @@ export default class Drainases {
           )
         );
       } else {
-        const data = requestBody();
+        const data = requestBody({ rightImages: [], leftImages: [] });
 
         delete data.left_images_drainase;
         delete data.right_images_drainase;
