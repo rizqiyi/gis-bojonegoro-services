@@ -212,9 +212,11 @@ export default class Drainases {
               });
 
               if (
-                images.length === req.files.left_drainase_images.length ||
-                0 + req.files.right_drainase_images.length ||
-                0
+                images.length ===
+                [
+                  ...(req.files.left_drainase_images || []),
+                  ...(req.files.right_drainase_images || []),
+                ].length
               ) {
                 const rightImages = images.filter(
                   (image) => image.image_name.split("_")[0] !== "left"
