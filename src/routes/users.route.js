@@ -7,16 +7,16 @@ import multer from "multer";
 const user = new UserController();
 const route = Router();
 
-route.post("/register", multer().single("avatar"), user.create);
-route.get("/", authMiddleware, user.getAll);
+// route.post("/register", multer().single("avatar"), user.create);
+route.get("/", authMiddleware, roleMiddleware, user.getAll);
 route.post("/login", user.login);
-// route.post(
-//   "/register",
-//   authMiddleware,
-//   roleMiddleware,
-//   multer().single("avatar"),
-//   user.create
-// );
+route.post(
+  "/register",
+  authMiddleware,
+  roleMiddleware,
+  multer().single("avatar"),
+  user.create
+);
 route.put(
   "/update/me",
   authMiddleware,
