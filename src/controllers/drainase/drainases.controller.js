@@ -1,6 +1,6 @@
 import Prisma from "@prisma/client";
 import ErrorHandler from "../../helpers/error.helper.js";
-import paginate from "../../helpers/paginate.helper.js";
+// import paginate from "../../helpers/paginate.helper.js";
 import DrainasesSchema from "../../validations/drainases.validations.js";
 import ImageKit from "../../helpers/imagekit.helper.js";
 
@@ -8,34 +8,138 @@ const prisma = new Prisma.PrismaClient();
 const schema = new DrainasesSchema();
 
 export default class Drainases {
+  getDashboardData = async (req, res) => {
+    try {
+      const totalDrainase = await prisma.gis_drainase.count();
+      const typicalTrapesium = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Trapesium",
+          right_typical: "Trapesium",
+        },
+      });
+
+      const typicalShapeU = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Bentuk U",
+          right_typical: "Bentuk U",
+        },
+      });
+
+      const typicalBronjong = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Bronjong",
+          right_typical: "Bronjong",
+        },
+      });
+
+      const typicalRect = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Kotak/Tertutup",
+          right_typical: "Kotak/Tertutup",
+        },
+      });
+
+      const goodCondition = await prisma.gis_drainase.count({
+        where: {
+          left_drainase_condition: "Baik",
+          right_drainase_condition: "Baik",
+        },
+      });
+
+      const lightBroken = await prisma.gis_drainase.count({
+        where: {
+          left_drainase_condition: "Rusak Ringan",
+          right_drainase_condition: "Rusak Ringan",
+        },
+      });
+
+      const mediumBroken = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Rusak Sedang",
+          right_typical: "Rusak Sedang",
+        },
+      });
+
+      const heavyBroken = await prisma.gis_drainase.count({
+        where: {
+          left_typical: "Rusak Berat",
+          right_typical: "Rusak Berat",
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          total: totalDrainase,
+          typicalTrapesium,
+          typicalShapeU,
+          typicalRect,
+          typicalBronjong,
+          goodCondition,
+          lightBroken,
+          mediumBroken,
+          heavyBroken,
+        },
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
+    }
+  };
+
   get = async (req, res) => {
     try {
-      const page = parseInt(req.query.page ?? 1, 10);
-      const perPage = parseInt(req.query.perPage ?? 10, 10);
+      // const page = parseInt(req.query.page ?? 1, 10);
+      // const perPage = parseInt(req.query.perPage ?? 10, 10);
 
-      const offset = page * perPage - perPage;
+      // const offset = page * perPage - perPage;
 
       const drainase = await prisma.gis_drainase.findMany({
         ...(req.query.is_published
-          ? { where: { is_published: JSON.parse(req.query.is_published) } }
+          ? {
+              where: {
+                district: {
+                  search: req.query.q,
+                },
+                sub_district: {
+                  search: req.query.q,
+                },
+                street_name: {
+                  search: req.query.q,
+                },
+                ...(req.query.street_path === "false"
+                  ? {}
+                  : { street_path: req.query.street_path }),
+                ...(req.query.is_published === "false"
+                  ? {}
+                  : { is_published: Boolean(req.query.is_published[0]) }),
+                ...(req.query.start_date && req.query.end_date
+                  ? {
+                      createdAt: {
+                        gte: new Date(req.query.start_date),
+                        lte: new Date(req.query.end_date),
+                      },
+                    }
+                  : {}),
+              },
+            }
           : {}),
-        skip: offset,
-        take: perPage,
+        // skip: offset,
+        // take: perPage,
         include: {
           left_images_drainase: true,
           right_images_drainase: true,
         },
       });
 
-      const data = await paginate(
-        { count: drainase.length, rows: drainase },
-        page,
-        perPage
-      );
+      // const data = await paginate(
+      //   { count: drainase.length, rows: drainase },
+      //   page,
+      //   perPage
+      // );
 
       return res.status(200).json({
         success: true,
-        data,
+        data: { data: drainase },
       });
     } catch (err) {
       ErrorHandler(res, err.message, 400);

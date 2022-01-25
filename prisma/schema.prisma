@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -23,6 +24,8 @@ model gis_user {
   drainases gis_drainase[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([fullname])
 }
 
 model gis_drainase {
@@ -52,6 +55,9 @@ model gis_drainase {
   user    gis_user @relation(fields: [user_id], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@index([district])
+  @@index([sub_district])
+  @@index([street_name])
 }
 
 model gis_left_images_drainase {

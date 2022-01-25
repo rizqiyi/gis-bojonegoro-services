@@ -7,16 +7,16 @@ import multer from "multer";
 const user = new UserController();
 const route = Router();
 
-route.post("/register", multer().single("avatar"), user.create);
-route.get("/", authMiddleware, user.getAll);
+// route.post("/register", multer().single("avatar"), user.create);
+route.get("/", authMiddleware, roleMiddleware, user.getAll);
 route.post("/login", user.login);
-// route.post(
-//   "/register",
-//   authMiddleware,
-//   roleMiddleware,
-//   multer().single("avatar"),
-//   user.create
-// );
+route.post(
+  "/register",
+  authMiddleware,
+  roleMiddleware,
+  multer().single("avatar"),
+  user.create
+);
 route.put(
   "/update/me",
   authMiddleware,
@@ -31,7 +31,7 @@ route.put(
   multer().single("avatar"),
   user.updateByID
 );
-// route.put("/update/me/pwd", authMiddleware, user.updateMyPassword);
+route.put("/update/me/pwd", authMiddleware, user.updateMyPassword);
 route.put("/update-role", authMiddleware, roleMiddleware, user.updateRole);
 route.delete("/delete/:id", authMiddleware, roleMiddleware, user.delete);
 

@@ -7,6 +7,7 @@ const drainase = new DrainasesController();
 const route = Router();
 
 route.get("/", drainase.get);
+route.get("/dashboard", authMiddleware, drainase.getDashboardData);
 route.get("/:id", drainase.getByID);
 route.post(
   "/create",
