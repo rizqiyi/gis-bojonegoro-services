@@ -110,7 +110,7 @@ export default class Drainases {
                   ? {}
                   : { street_path: req.query.street_path }),
                 ...(req.query.is_published === "false"
-                  ? {}
+                  ? { is_published: JSON.parse(req.query.is_published) }
                   : { is_published: Boolean(req.query.is_published[0]) }),
                 ...(req.query.start_date && req.query.end_date
                   ? {
