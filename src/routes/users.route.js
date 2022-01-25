@@ -31,7 +31,7 @@ route.put(
   multer().single("avatar"),
   user.updateByID
 );
-// route.put("/update/me/pwd", authMiddleware, user.updateMyPassword);
+route.put("/update/me/pwd", authMiddleware, user.updateMyPassword);
 route.put("/update-role", authMiddleware, roleMiddleware, user.updateRole);
 route.delete("/delete/:id", authMiddleware, roleMiddleware, user.delete);
 

@@ -102,14 +102,19 @@ export default class Users {
 
   getAll = async (req, res) => {
     try {
-      const page = parseInt(req.query.page ?? 1, 10);
-      const perPage = parseInt(req.query.perPage ?? 10, 10);
+      // const page = parseInt(req.query.page ?? 1, 10);
+      // const perPage = parseInt(req.query.perPage ?? 10, 10);
 
-      const offset = page * perPage - perPage;
+      // const offset = page * perPage - perPage;
 
       const users = await prisma.gis_user.findMany({
-        skip: offset,
-        take: perPage,
+        // skip: offset,
+        // take: perPage,
+        where: {
+          fullname: {
+            search: req.query.q,
+          },
+        },
         select: {
           username: true,
           email: true,
@@ -123,15 +128,15 @@ export default class Users {
         },
       });
 
-      const data = await paginate(
-        { count: users.length, rows: users },
-        page,
-        perPage
-      );
+      // const data = await paginate(
+      //   { count: users.length, rows:  },
+      //   page,
+      //   perPage
+      // );
 
       return res.status(200).json({
         success: true,
-        data,
+        data: { data: users },
       });
     } catch (err) {
       ErrorHandler(res, err, 400);
@@ -486,6 +491,69 @@ export default class Users {
           message: "Data pengguna berhasil diperbarui",
         });
       }
+    } catch (err) {
+      ErrorHandler(res, err.message);
+    }
+  };
+
+  updateMyPassword = async (req, res) => {
+    try {
+      const isNotValidate = schema.ChangeMyPasswordValidationSchema.validate(
+        req.body
+      );
+
+      if (isNotValidate.error) {
+        return ErrorHandler(res, isNotValidate.error.details[0].message, 400);
+      }
+
+      const user = await prisma.gis_user.findUnique({
+        where: {
+          id: +req.user.payload.id,
+        },
+      });
+
+      if (!user) return ErrorHandler(res, "User tidak ditemukan", 404);
+
+      const isPasswordMatch = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+
+      if (!isPasswordMatch)
+        return ErrorHandler(res, "Password lama salah", 400);
+
+      const generatePassword = async (params) => {
+        if (params.newPassword) {
+          const salt = await bcrypt.genSalt(10);
+
+          const password = await bcrypt.hash(params.newPassword, salt);
+
+          return password;
+        }
+
+        return;
+      };
+
+      const password = await generatePassword(req.body);
+
+      await prisma.gis_user.update({
+        where: {
+          id: +req.user.payload.id,
+        },
+        data: {
+          email: req.body.email,
+          fullname: req.body.fullname,
+          username: req.body.username,
+          manage: req.body.manage,
+          role_name: req.body.role_name,
+          password,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Password berhasil diperbarui",
+      });
     } catch (err) {
       ErrorHandler(res, err.message);
     }

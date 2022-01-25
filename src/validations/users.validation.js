@@ -41,6 +41,21 @@ export default class UsersValidation {
     }),
   });
 
+  ChangeMyPasswordValidationSchema = Joi.object({
+    password: Joi.string(),
+    newPassword: Joi.string().min(6).max(10).required().messages({
+      "string.min": `Kata sandi tidak boleh kurang dari {#limit} karakter`,
+      "string.max": `Kata sandi tidak boleh lebih dari {#limit} karakter`,
+    }),
+    verifyNewPassword: Joi.string()
+      .required()
+      .valid(Joi.ref("newPassword"))
+      .messages({
+        "any.required": "Ulangi kata sandi tidak boleh kosong",
+        "any.only": "Kata sandi harus sama dengan kata sandi sebelumnya",
+      }),
+  });
+
   LoginValidationSchema = Joi.object({
     username: Joi.string().required().messages({
       "string.empty": `Nama pengguna tidak boleh kosong`,
