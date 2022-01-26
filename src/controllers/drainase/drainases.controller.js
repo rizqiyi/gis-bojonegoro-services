@@ -95,10 +95,14 @@ export default class Drainases {
 
       const drainase = await prisma.gis_drainase.findMany({
         where: {
-          createdAt: {
-            gte: new Date(req.query.start_date),
-            lt: new Date(req.query.end_date),
-          },
+          ...(req.query.start_date && req.query.end_date
+            ? {
+                createdAt: {
+                  gte: new Date(req.query.start_date),
+                  lt: new Date(req.query.end_date),
+                },
+              }
+            : {}),
           district: {
             search: req.query.q,
           },
