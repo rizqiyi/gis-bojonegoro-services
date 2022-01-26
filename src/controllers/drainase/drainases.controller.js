@@ -94,35 +94,27 @@ export default class Drainases {
       // const offset = page * perPage - perPage;
 
       const drainase = await prisma.gis_drainase.findMany({
-        ...(req.query.is_published
-          ? {
-              where: {
-                district: {
-                  search: req.query.q,
-                },
-                sub_district: {
-                  search: req.query.q,
-                },
-                street_name: {
-                  search: req.query.q,
-                },
-                ...(req.query.street_path === "false"
-                  ? {}
-                  : { street_path: req.query.street_path }),
-                ...(req.query.is_published === "false"
-                  ? { is_published: JSON.parse(req.query.is_published) }
-                  : { is_published: Boolean(req.query.is_published[0]) }),
-                ...(req.query.start_date && req.query.end_date
-                  ? {
-                      createdAt: {
-                        gte: new Date(req.query.start_date),
-                        lte: new Date(req.query.end_date),
-                      },
-                    }
-                  : {}),
-              },
-            }
-          : {}),
+        where: {
+          createdAt: {
+            gte: new Date(req.query.start_date),
+            lt: new Date(req.query.end_date),
+          },
+          district: {
+            search: req.query.q,
+          },
+          sub_district: {
+            search: req.query.q,
+          },
+          street_name: {
+            search: req.query.q,
+          },
+          ...(req.query.street_path === "false"
+            ? {}
+            : { street_path: req.query.street_path }),
+          ...(req.query.is_published
+            ? { is_published: JSON.parse(req.query.is_published) }
+            : {}),
+        },
         // skip: offset,
         // take: perPage,
         include: {
