@@ -7,14 +7,14 @@ const drainase = new DrainasesController();
 const route = Router();
 
 route.get("/", drainase.get);
-route.get("/dashboard", authMiddleware, drainase.getDashboardData);
+route.get("/dashboard", drainase.getDashboardData);
 route.get("/:id", drainase.getByID);
 route.post(
   "/create",
   authMiddleware,
   multer().fields([
-    { name: "left_drainase_images", maxCount: 2 },
-    { name: "right_drainase_images", maxCount: 2 },
+    { name: "left_drainase_images", maxCount: 10 },
+    { name: "right_drainase_images", maxCount: 10 },
   ]),
   drainase.create
 );
@@ -22,8 +22,8 @@ route.put(
   "/update/:id",
   authMiddleware,
   multer().fields([
-    { name: "left_drainase_images", maxCount: 2 },
-    { name: "right_drainase_images", maxCount: 2 },
+    { name: "left_drainase_images", maxCount: 10 },
+    { name: "right_drainase_images", maxCount: 10 },
   ]),
   drainase.update
 );
