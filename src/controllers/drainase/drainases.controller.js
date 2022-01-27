@@ -119,6 +119,13 @@ export default class Drainases {
             ? { is_published: JSON.parse(req.query.is_published) }
             : {}),
         },
+        ...(req.query.order_by
+          ? {
+              orderBy: {
+                createdAt: req.query.order_by,
+              },
+            }
+          : {}),
         // skip: offset,
         // take: perPage,
         include: {
