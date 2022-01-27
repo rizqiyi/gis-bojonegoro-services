@@ -115,6 +115,13 @@ export default class Users {
             search: req.query.q,
           },
         },
+        ...(req.query.order_by
+          ? {
+              orderBy: {
+                createdAt: req.query.order_by,
+              },
+            }
+          : {}),
         select: {
           username: true,
           email: true,
