@@ -13,57 +13,105 @@ export default class Drainases {
       const totalDrainase = await prisma.gis_drainase.count();
       const typicalTrapesium = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Trapesium",
-          right_typical: "Trapesium",
+          OR: [
+            {
+              left_typical: "Trapesium",
+            },
+            {
+              right_typical: "Trapesium",
+            },
+          ],
         },
       });
 
       const typicalShapeU = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Bentuk U",
-          right_typical: "Bentuk U",
+          OR: [
+            {
+              left_typical: "Bentuk U",
+            },
+            {
+              right_typical: "Bentuk U",
+            },
+          ],
         },
       });
 
       const typicalBronjong = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Bronjong",
-          right_typical: "Bronjong",
+          OR: [
+            {
+              left_typical: "Bronjong",
+            },
+            {
+              right_typical: "Bronjong",
+            },
+          ],
         },
       });
 
       const typicalRect = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Kotak/Tertutup",
-          right_typical: "Kotak/Tertutup",
+          OR: [
+            {
+              left_typical: "Kotak/Tertutup",
+            },
+            {
+              right_typical: "Kotak/Tertutup",
+            },
+          ],
         },
       });
 
       const goodCondition = await prisma.gis_drainase.count({
         where: {
-          left_drainase_condition: "Baik",
-          right_drainase_condition: "Baik",
+          OR: [
+            {
+              left_drainase_condition: "Baik",
+            },
+            {
+              right_drainase_condition: "Baik",
+            },
+          ],
         },
       });
 
       const lightBroken = await prisma.gis_drainase.count({
         where: {
-          left_drainase_condition: "Rusak Ringan",
-          right_drainase_condition: "Rusak Ringan",
+          OR: [
+            {
+              left_drainase_condition: "Rusak Ringan",
+            },
+            {
+              right_drainase_condition: "Rusak Ringan",
+            },
+          ],
         },
       });
 
       const mediumBroken = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Rusak Sedang",
-          right_typical: "Rusak Sedang",
+          OR: [
+            {
+              left_typical: "Rusak Sedang",
+            },
+            {
+              right_typical: "Rusak Sedang",
+            },
+          ],
         },
       });
 
       const heavyBroken = await prisma.gis_drainase.count({
         where: {
-          left_typical: "Rusak Berat",
-          right_typical: "Rusak Berat",
+          OR: [
+            {
+              left_typical: "Rusak Berat",
+            },
+            {
+              right_typical: "Rusak Berat",
+            },
+          ],
         },
       });
 
