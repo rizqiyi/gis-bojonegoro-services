@@ -93,10 +93,10 @@ export default class Drainases {
         where: {
           OR: [
             {
-              left_typical: "Rusak Sedang",
+              left_drainase_condition: "Rusak Sedang",
             },
             {
-              right_typical: "Rusak Sedang",
+              right_drainase_condition: "Rusak Sedang",
             },
           ],
         },
@@ -106,10 +106,10 @@ export default class Drainases {
         where: {
           OR: [
             {
-              left_typical: "Rusak Berat",
+              left_drainase_condition: "Rusak Berat",
             },
             {
-              right_typical: "Rusak Berat",
+              right_drainase_condition: "Rusak Berat",
             },
           ],
         },
