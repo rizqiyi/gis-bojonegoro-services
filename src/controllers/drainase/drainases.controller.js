@@ -166,6 +166,13 @@ export default class Drainases {
           ...(req.query.is_published
             ? { is_published: JSON.parse(req.query.is_published) }
             : {}),
+          ...(req.query.sta
+            ? {
+                sta: {
+                  gte: req.query.sta,
+                },
+              }
+            : {}),
         },
         ...(req.query.order_by
           ? {
