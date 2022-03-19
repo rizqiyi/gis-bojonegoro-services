@@ -1,6 +1,6 @@
 import Prisma from "@prisma/client";
 import ErrorHandler from "../../helpers/error.helper.js";
-// import paginate from "../../helpers/paginate.helper.js";
+import paginate from "../../helpers/paginate.helper.js";
 import DrainasesSchema from "../../validations/drainases.validations.js";
 import ImageKit from "../../helpers/imagekit.helper.js";
 
@@ -136,10 +136,10 @@ export default class Drainases {
 
   get = async (req, res) => {
     try {
-      // const page = parseInt(req.query.page ?? 1, 10);
-      // const perPage = parseInt(req.query.perPage ?? 10, 10);
+      const page = parseInt(req.query.page ?? 1, 10);
+      const perPage = parseInt(req.query.perPage ?? 5, 10);
 
-      // const offset = page * perPage - perPage;
+      const offset = page * perPage - perPage;
 
       const drainase = await prisma.gis_drainase.findMany({
         where: {
@@ -181,23 +181,65 @@ export default class Drainases {
               },
             }
           : {}),
-        // skip: offset,
-        // take: perPage,
+        skip: offset,
+        take: perPage,
         include: {
           left_images_drainase: true,
           right_images_drainase: true,
         },
       });
 
-      // const data = await paginate(
-      //   { count: drainase.length, rows: drainase },
-      //   page,
-      //   perPage
-      // );
+      const total = await prisma.gis_drainase.count({
+        where: {
+          ...(req.query.start_date && req.query.end_date
+            ? {
+                createdAt: {
+                  gte: new Date(req.query.start_date),
+                  lt: new Date(req.query.end_date),
+                },
+              }
+            : {}),
+          district: {
+            search: req.query.q,
+          },
+          sub_district: {
+            search: req.query.q,
+          },
+          street_name: {
+            search: req.query.q,
+          },
+          ...(req.query.street_path === "false"
+            ? {}
+            : { street_path: req.query.street_path }),
+          ...(req.query.is_published
+            ? { is_published: JSON.parse(req.query.is_published) }
+            : {}),
+          ...(req.query.sta
+            ? {
+                sta: {
+                  gte: req.query.sta,
+                },
+              }
+            : {}),
+        },
+        ...(req.query.order_by
+          ? {
+              orderBy: {
+                createdAt: req.query.order_by,
+              },
+            }
+          : {}),
+      });
+
+      const data = await paginate(
+        { count: total, rows: drainase },
+        page,
+        perPage
+      );
 
       return res.status(200).json({
         success: true,
-        data: { data: drainase },
+        data,
       });
     } catch (err) {
       ErrorHandler(res, err.message, 400);
