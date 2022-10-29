@@ -246,6 +246,29 @@ export default class Drainases {
     }
   };
 
+  getDistrict = async (req, res) => {
+    try {
+      const district = await prisma.gis_drainase.findMany({
+        distinct: "street_name",
+        select: {
+          street_name: true,
+        },
+        where: {
+          ...(req.query.street_path === "false"
+            ? {}
+            : { street_path: req.query.street_path }),
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: district,
+      });
+    } catch (err) {
+      ErrorHandler(res, err.message, 400);
+    }
+  };
+
   getByID = async (req, res) => {
     try {
       const drainase = await prisma.gis_drainase.findUnique({
