@@ -8,7 +8,7 @@ const route = Router();
 
 route.get("/", drainase.get);
 route.get("/dashboard", drainase.getDashboardData);
-route.get("/:id", drainase.getByID);
+route.get("/district", drainase.getDistrict);
 route.post(
   "/create",
   authMiddleware,
@@ -18,6 +18,7 @@ route.post(
   ]),
   drainase.create
 );
+route.get("/:id", drainase.getByID);
 route.put(
   "/update/:id",
   authMiddleware,
